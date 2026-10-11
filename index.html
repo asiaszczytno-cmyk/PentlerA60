@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Symulator Pracy i Ulepszeń</title>
+<style>
+:root{--c1:#ef4444;--c2:#b91c1c;}
+body{font-family:sans-serif;background:#09090b;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;gap:15px;}
+.side-box{background:#16161a;border:1px solid #3f3f46;padding:15px;border-radius:16px;width:190px;height:500px;display:flex;flex-direction:column;overflow-y:auto;}
+.main-box{background:#16161a;border:2px solid #6366f1;padding:20px;border-radius:20px;text-align:center;width:340px;height:500px;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.num{font-size:2.5rem;font-weight:900;margin-bottom:2px;}
+.btn-row{display:flex;justify-content:center;align-items:center;gap:12px;margin:15px 0;}
+.btn{background:var(--c1);color:#fff;border:none;width:110px;height:110px;border-radius:50%;font-size:1.1rem;font-weight:bold;cursor:pointer;box-shadow:0 6px 0 var(--c2);outline:none;position:relative;z-index:2;}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--c2);}
+.awans-btn{display:none;background:#eab308;color:#000;border:none;padding:10px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.85rem;}
+.upg{background:#27272a;color:#fff;border:1px solid #3f3f46;padding:10px;border-radius:8px;width:100%;cursor:pointer;display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:15px;}
+.upg:disabled{opacity:0.3;cursor:not-allowed;}
+.job-opt{background:#27272a;padding:10px;border-radius:8px;margin-bottom:8px;cursor:pointer;border:1px solid #3f3f46;text-align:center;font-size:0.8rem;transition:0.2s;}
+.job-opt:hover{border-color:#6366f1;background:#1f1f23;}
+.sklep-item{background:#27272a;padding:6px;border-radius:6px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;}
+.sklep-btn{background:#22c55e;border:none;color:#fff;padding:3px 6px;border-radius:4px;cursor:pointer;font-weight:bold;}
+.sklep-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.eq-item{font-size:0.75rem;color:#a1a1aa;background:#27272a;padding:2px 6px;border-radius:4px;display:inline-block;margin:2px;}
+.credits-box{background:rgba(30,41,59,0.5);border:1px dashed #38bdf8;padding:10px;border-radius:10px;text-align:center;font-size:0.75rem;color:#38bdf8;margin-top:auto;font-style:italic;}
+.floating-text{position:absolute;color:#ef4444;font-weight:bold;font-size:1.2rem;pointer-events:none;animation:floatUp 0.6s ease-out forwards;z-index:5;}
+.q-title{background:linear-gradient(45deg,#f59e0b,#ef4444);color:#fff;padding:8px;border-radius:8px;font-weight:bold;font-size:0.85rem;margin-bottom:10px;border:2px solid #fff;box-shadow:0 0 15px #f59e0b;}
+.comp-title{background:linear-gradient(45deg,#a855f7,#6366f1);color:#fff;padding:6px;border-radius:8px;font-weight:bold;font-size:0.85rem;margin-bottom:6px;border:2px solid #fff;box-shadow:0 0 15px #a855f7;}
+.event-box{background:#1e1b4b;border:1px solid #4338ca;border-radius:8px;padding:6px;margin-top:auto;display:none;text-align:center;}
+.company-box{background:#1e293b;border:1px solid #64748b;border-radius:10px;padding:8px;margin-top:5px;font-size:0.75rem;}
+.comp-inp{width:90%;background:#0f172a;border:1px solid #475569;color:#fff;padding:4px;border-radius:4px;font-size:0.7rem;margin-bottom:4px;outline:none;}
+.trade-box{background:#1e293b;border:1px solid #22c55e;border-radius:10px;padding:8px;margin-top:5px;font-size:0.72rem;text-align:center;}
+@keyframes floatUp{0%{transform:translateY(0) scale(1);opacity:1;}100%{transform:translateY(-60px) scale(0.8);opacity:0;}}
+</style>
+</head>
+<body>
+<div class="side-box">
+<h3 style="margin-top:0;color:#6366f1;font-size:0.95rem;text-align:center;">💼 WYBIERZ PRACĘ</h3>
+<div class="job-opt" onclick="setJob('Zamiatacz')">🧹 Zamiatacz (0.05zł/s)</div>
+<div class="job-opt" onclick="setJob('Mistrz Kebabu')">🌯 Kebab (0.25zł/s)</div>
+<div class="job-opt" onclick="setJob('Szef IT')">💻 Szef IT (1.20zł/s)</div>
+<p id="jobStatus" style="font-size:0.8rem;text-align:center;color:#a1a1aa;margin:5px 0;">Praca: Brak</p>
+<div class="job-opt" id="janusz-btn" style="border:1px dashed #ef4444;color:#ef4444;margin-top:2px;font-weight:bold;" onclick="talkToJanusz()">🧔 Układ z Januszem (1M klików)</div>
+<div class="job-opt" id="bot-btn" style="border:1px solid #a855f7;color:#a855f7;margin-top:2px;font-weight:bold;" onclick="buyFinancialBot()">🤖 Auto Clicker (1T klików)</div>
+<div class="job-opt" id="dragon-btn" style="border:1px solid #ec4899;color:#ec4899;margin-top:2px;font-weight:bold;" onclick="buyEndDragon()">🐉 Smok END (600Qa klików)</div>
+<div class="job-opt" id="cat-btn" style="border:1px solid #f97316;color:#f97316;margin-top:2px;font-weight:bold;" onclick="dealWithCat()">🐱 Układ z Kotem (Zysk x1000)</div>
+<div class="job-opt" id="hack-btn" style="border:1px dashed #22c55e;color:#22c55e;margin-top:2px;font-weight:bold;display:none;" onclick="sendHackers()">🥷 Banda Hakerów (1M klików)</div>
+<div class="trade-box" id="tBox">
+<div style="font-weight:bold;color:#22c55e;margin-bottom:2px;">🤝 WYMIANA (TRADE)</div>
+<div id="tNpc" style="font-style:italic;color:#eab308;margin-bottom:2px;">Czekam na gracza...</div>
+<div id="tOffer" style="margin-bottom:4px;font-size:0.68rem;line-height:1.2;"></div>
+<button id="tBtn" onclick="acceptTrade()" style="background:#22c55e;color:#fff;border:none;padding:3px 10px;border-radius:4px;font-weight:bold;cursor:pointer;font-size:0.65rem;" disabled>Wymień</button>
+</div>
+<div class="company-box" id="compForm">
+<div style="font-weight:bold;color:#38bdf8;text-align:center;margin-bottom:4px;">🏢 ZAŁÓŻ FIRMĘ</div>
+<input type="text" id="cName" class="comp-inp" placeholder="Nazwa firmy...">
+<input type="text" id="cCat" class="comp-inp" placeholder="Kategoria (np. Gry)...">
+<button id="s-company-btn" onclick="createCompany()" style="background:#38bdf8;color:#000;border:none;width:100%;padding:4px;border-radius:4px;font-weight:bold;cursor:pointer;font-size:0.7rem;">Zarejestruj (500Qa zł)</button>
+</div>
+<div class="event-box" id="evBox">
+<div id="evTxt" style="font-size:0.68rem;font-weight:bold;margin-bottom:4px;line-height:1.2;"></div>
+<div style="display:flex;gap:4px;justify-content:center;">
+<button onclick="goEvent()" style="background:#22c55e;color:#fff;border:none;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:bold;cursor:pointer;">Idź</button>
+<button onclick="ignoreEvent()" style="background:#3f3f46;color:#fff;border:none;padding:2px 8px;border-radius:4px;font-size:0.65rem;cursor:pointer;">Odrzuć</button>
+</div>
+</div>
+<div class="credits-box">⭐ Dziękujemy Olek za wsparcie!</div>
+</div>
+<div class="main-box" id="mainGameBox">
+<div id="qwildialder-title" class="q-title" style="display:none;">👑 NAJBOGATSZY CHŁOP W GRZE 👑</div>
+<div id="custom-company-banner" class="comp-title" style="display:none;"></div>
+<div style="font-size:0.8rem;color:#a1a1aa;">KLIKI: <span id="scr" style="font-weight:bold;color:#fff;">0</span> <span id="shortScr" style="color:#eab308;font-weight:bold;"></span> (<span id="pow" style="color:#ef4444;">+1</span>)</div>
+<div class="num" id="pln">0.00 zł</div>
+<div style="font-size:0.8rem;color:#eab308;font-weight:bold;margin-bottom:10px;">Zarobione Złotówki</div>
+<div class="btn-row">
+<button class="btn" id="click">KLIK!</button>
+<button class="awans-btn" id="awans">⚡ AWANSUJ<br><span style="font-size:0.65rem;font-weight:normal;">-5 klików</span></button>
+</div>
+<button class="upg" id="upgBtn" disabled>
+<span id="upgT">Kup ulepszenie (x2)</span>
+<span style="color:#f59e0b;font-weight:bold;" id="upgC">Koszt: 5</span>
+</button>
+<h4 style="margin:10px 0 5px 0;font-size:0.85rem;color:#a1a1aa;text-align:left;">🎒 TWOJE RZECZY:</h4>
+<div id="eq" style="text-align:left;max-height:75px;overflow-y:auto;flex-grow:1;"></div>
+<div style="margin-top:auto;padding-top:8px;font-size:0.75rem;color:#eab308;font-weight:bold;border-top:1px solid #27272a;letter-spacing:0.5px;">
+📈 GLOBALNE ODWIEDZINY STRONY: <span id="globalVisits" style="color:#fff;background:#27272a;padding:2px 6px;border-radius:4px;margin-left:4px;">Ładowanie...</span>
+</div>
+</div>
+<div class="side-box" style="width:210px;">
+<h3 style="margin-top:0;color:#22c55e;font-size:0.95rem;text-align:center;">🛒 SKLEP ZA ZŁ</h3>
+<div class="sklep-item"><span>🍩 Zgniły pączek</span><button class="sklep-btn" id="s-donut" onclick="buy('🍩 Pączek',2.0)">2zł</button></div>
+<div class="sklep-item"><span>🧦 Brudna skarpeta</span><button class="sklep-btn" id="s-sock" onclick="buy('🧦 Skarpeta',4.5)">4.5zł</button></div>
+<div class="sklep-item"><span>📱 iPhone bez ekranu</span><button class="sklep-btn" id="s-phone" onclick="buy('📱 Stary iPhone',12.0)">12zł</button></div>
+<div class="sklep-item"><span>👑 Złoty Wuggy</span><button class="sklep-btn" id="s-wuggy" onclick="buy('👑 Złoty Wuggy',25.0)">25zł</button></div>
+<div class="sklep-item" style="border:1px solid #38bdf8;border-radius:4px;"><span>🛡️ Cyber Tarcza</span><button class="sklep-btn" id="s-shield" style="background:#38bdf8;color:#000;" onclick="buyShield()">100Qa</button></div>
+<div class="sklep-item" style="border:1px dashed #ef4444;border-radius:6px;padding:4px;"><span>🎫 Zdrapka "PUŁAPKA"</span><button class="sklep-btn" id="s-scratch" style="background:#ef4444;color:#fff;" onclick="scratchCard()">5zł</button></div>
+<div id="scratchResult" style="font-size:0.65rem;text-align:center;color:#ef4444;margin-top:2px;height:24px;font-weight:bold;line-height:1.1;"></div>
+<button onclick="resetGame()" style="margin-top:auto;background:#3f3f46;color:#fff;border:none;padding:5px;border-radius:4px;font-size:0.7rem;cursor:pointer;">⚠️ Reset gry</button>
+</div>
+<script>
+let clicks=0,zlotowki=0.0,clickValue=1,upgradeCost=5,nextMultiplier=2,currentJob="";
+let purchasedItems=[],hasBot=0,hasDragon=0,hasTitle=0,hasShield=0;
+let businessPartners=0,currentEvent="",myCompanyName="",myCompanyCat="",hasCompany=0;
+let catTricked=0,revengeDone=0,activeTrade=null;
+let stolenClicks=0,stolenCash=0.0;
+const scrD=document.getElementById('scr'),plnD=document.getElementById('pln'),powD=document.getElementById('pow');
+const cB=document.getElementById('click'),aB=document.getElementById('awans');
+const uB=document.getElementById('upgBtn'), uT=document.getElementById('upgT'), uC=document.getElementById('upgC');
+const jS=document.getElementById('jobStatus'),eqD=document.getElementById('eq'),mainBox=document.getElementById('mainGameBox');
+function loadGame(){
+if(localStorage.getItem('clicker_clicks'))clicks=parseInt(localStorage.getItem('clicker_clicks'));
+if(localStorage.getItem('clicker_zlotowki'))zlotowki=parseFloat(localStorage.getItem('clicker_zlotowki'));
+if(localStorage.getItem('clicker_clickValue'))clickValue=parseInt(localStorage.getItem('clicker_clickValue'));
+if(localStorage.getItem('clicker_upgradeCost'))upgradeCost=parseInt(localStorage.getItem('clicker_upgradeCost'));
+if(localStorage.getItem('clicker_nextMultiplier'))nextMultiplier=parseInt(localStorage.getItem('clicker_nextMultiplier'));
+if(localStorage.getItem('clicker_hasBot'))hasBot=parseInt(localStorage.getItem('clicker_hasBot'));
+if(localStorage.getItem('clicker_hasDragon'))hasDragon=parseInt(localStorage.getItem('clicker_hasDragon'));
+if(localStorage.getItem('clicker_hasTitle'))hasTitle=parseInt(localStorage.getItem('clicker_hasTitle'));
+if(localStorage.getItem('clicker_hasShield'))hasShield=parseInt(localStorage.getItem('clicker_hasShield'));
+if(localStorage.getItem('clicker_partners'))businessPartners=parseInt(localStorage.getItem('clicker_partners'))||0;
+if(localStorage.getItem('clicker_hasComp'))hasCompany=parseInt(localStorage.getItem('clicker_hasComp'))||0;
+if(localStorage.getItem('clicker_compName'))myCompanyName=localStorage.getItem('clicker_compName')||"";
+if(localStorage.getItem('clicker_compCat'))myCompanyCat=localStorage.getItem('clicker_compCat')||"";
+if(localStorage.getItem('clicker_catTricked'))catTricked=parseInt(localStorage.getItem('clicker_catTricked'))||0;
+if(localStorage.getItem('clicker_revenge'))revengeDone=parseInt(localStorage.getItem('clicker_revenge'))||0;
+if(localStorage.getItem('clicker_stolenClicks'))stolenClicks=parseInt(localStorage.getItem('clicker_stolenClicks'))||0;
+if(localStorage.getItem('clicker_stolenCash'))stolenCash=parseFloat(localStorage.getItem('clicker_stolenCash'))||0.0;
+if(localStorage.getItem('clicker_currentJob')){currentJob=localStorage.getItem('clicker_currentJob');jS.innerText="Praca: "+currentJob;jS.style.color="#6366f1";aB.style.display="block";}
+if(localStorage.getItem('clicker_items')){purchasedItems=JSON.parse(localStorage.getItem('clicker_items'));}
+renderEq();fetchVisits();update();
+}
+function fetchVisits(){
+fetch('https://countapi.xyz')
+.then(res=>res.json()).then(data=>{document.getElementById('globalVisits').innerText=data.value;})
+.catch(()=>{document.getElementById('globalVisits').innerText="142";});
+}
+function saveGame(){
+localStorage.setItem('clicker_clicks',clicks);localStorage.setItem('clicker_zlotowki',zlotowki);localStorage.setItem('clicker_clickValue',clickValue);
+localStorage.setItem('clicker_upgradeCost',upgradeCost);localStorage.setItem('clicker_nextMultiplier',nextMultiplier);localStorage.setItem('clicker_currentJob',currentJob);
+localStorage.setItem('clicker_items',JSON.stringify(purchasedItems));localStorage.setItem('clicker_hasBot',hasBot);localStorage.setItem('clicker_hasDragon',hasDragon);
+localStorage.setItem('clicker_hasTitle',hasTitle);localStorage.setItem('clicker_hasShield',hasShield);localStorage.setItem('clicker_partners',businessPartners);
+localStorage.setItem('clicker_hasComp',hasCompany);localStorage.setItem('clicker_compName',myCompanyName);localStorage.setItem('clicker_compCat',myCompanyCat);
+localStorage.setItem('clicker_catTricked',catTricked);localStorage.setItem('clicker_revenge',revengeDone);
+localStorage.setItem('clicker_stolenClicks',stolenClicks);localStorage.setItem('clicker_stolenCash',stolenCash);
+}
+function getShortValue(val){
+let absVal=Math.abs(val);
+if(absVal>=1000000000000000000)return "Googolplex+";
+if(absVal>=1000000000000000)return(val/1000000000000000).toFixed(2)+"Qa";
+if(absVal>=1000000000000)return(val/1000000000000).toFixed(2)+"T";
+if(absVal>=1000000000)return(val/1000000000).toFixed(2)+"B";
+if(absVal>=1000000)return(val/1000000).toFixed(2)+"M";
+if(absVal>=1000)return(val/1000).toFixed(2)+"K";
+return val.toFixed(2);
+}
+function renderEq(){
+eqD.innerHTML="";purchasedItems.forEach(name=>{const s=document.createElement('span');s.className='eq-item';s.innerText=name;eqD.appendChild(s);});
+}
+</script>
+<script>
+function update(){
+scrD.innerText=clicks;let shortClicks=getShortValue(clicks);
+document.getElementById('shortScr').innerText=clicks>=1000?"("+shortClicks+")":"";
+if(zlotowki<0){plnD.innerText="-"+getShortValue(zlotowki)+" zł";plnD.style.color="#ef4444";}else{plnD.innerText=getShortValue(zlotowki)+" zł";plnD.style.color="#fff";}
+powD.innerText="+"+getShortValue(clickValue);
+if(clicks>=10000000000000) {uT.innerText="Hiper Napęd Ulepszeń";uC.innerText="Koszt: "+getShortValue(upgradeCost);}
+else {uT.innerText="Kup ulepszenie (x"+nextMultiplier+")";uC.innerText="Koszt: "+upgradeCost;}
+uB.disabled=clicks<upgradeCost;aB.disabled=clicks<5;
+document.getElementById('s-donut').disabled=zlotowki<2.0;document.getElementById('s-sock').disabled=zlotowki<4.5;document.getElementById('s-phone').disabled=zlotowki<12.0;document.getElementById('s-wuggy').disabled=zlotowki<25.0;document.getElementById('s-scratch').disabled=zlotowki<-100000000000000;
+document.getElementById('s-shield').disabled=zlotowki<100000000000000000||hasShield;if(hasShield){document.getElementById('s-shield').innerText="AKTYWNA";}
+document.getElementById('s-company-btn').disabled=zlotowki<500000000000000000||hasCompany;
+const jB=document.getElementById('janusz-btn');if(zlotowki<0){jB.style.display="block";}else{jB.style.display="none";}
+const bB=document.getElementById('bot-btn');if(hasBot){bB.innerText="🤖 Auto Clicker (AKTYWNY)";bB.style.borderColor="#22c55e";bB.style.color="#22c55e";}else{bB.style.opacity=clicks<1000000000000?0.4:1;}
+const dB=document.getElementById('dragon-btn');if(hasDragon){dB.innerText="🐉 Smok END (AKTYWNY)";dB.style.borderColor="#22c55e";dB.style.color="#22c55e";}else{dB.style.opacity=clicks<600000000000000?0.4:1;}
+const cF=document.getElementById('compForm');const cB_banner=document.getElementById('custom-company-banner');
+if(hasCompany){cF.style.display="none";cB_banner.innerText="🏢 Korporacja: "+myCompanyName+" ["+myCompanyCat+"]";cB_banner.style.display="block";}else{cF.style.display="block";cB_banner.style.display="none";}
+const catB=document.getElementById('cat-btn');const hkB=document.getElementById('hack-btn');
+if(catTricked){catB.style.display="none";hkB.style.display="block";if(revengeDone){hkB.innerText="🐉 ZEMSTA DOKONANA!";hkB.style.borderColor="#22c55e";hkB.style.color="#22c55e";}else{hkB.style.opacity=clicks<1000000?0.4:1;}}else{catB.style.display="block";hkB.style.display="none";}
+if(activeTrade){const hasItem=purchasedItems.includes(activeTrade.need);document.getElementById('tBtn').disabled=!hasItem;}
+}
+window.dealWithCat=function(){if(!catTricked){catTricked=1;stolenClicks=clicks;stolenCash=zlotowki;localStorage.clear();clicks=0;zlotowki=0.0;clickValue=1;upgradeCost=5;nextMultiplier=2;currentJob="";purchasedItems=[];hasBot=0;hasDragon=0;hasTitle=0;hasShield=0;businessPartners=0;hasCompany=0;alert("KOT CIĘ BEZCZELNIE OSZUKAŁ! Ukradł wszystko i uciekł! Zbankrutowałeś...");saveGame();update();renderEq();}}
+window.sendHackers=function(){if(catTricked && !revengeDone && clicks>=1000000){clicks-=1000000;revengeDone=1;clicks+=stolenClicks;zlotowki+=stolenCash;zlotowki+=1000000000.0;purchasedItems.push('🐱 Skóra Kota');renderEq();alert("🥷 BANDA HAKERÓW URUCHOMIONA! Odzyskano majątek!");saveGame();update();}}
+window.setJob=function(jobName){currentJob=jobName;jS.innerText="Praca: "+jobName;jS.style.color="#6366f1";aB.style.display="block";saveGame();update();}
+function createFloatingText(e){const text=document.createElement('div');text.className='floating-text';text.innerText="+"+getShortValue(clickValue);const rect=mainBox.getBoundingClientRect();text.style.left=(e.clientX-rect.left-15)+'px';text.style.top=(e.clientY-rect.top-20)+'px';mainBox.appendChild(text);setTimeout(()=>{text.remove();},600);}
+cB.addEventListener('click',(e)=>{clicks+=clickValue;createFloatingText(e);saveGame();update();});
+aB.addEventListener('click',()=>{if(clicks>=5){clicks-=5;zlotowki+=0.70;saveGame();update();}});
+uB.addEventListener('click',()=> {if(clicks>=upgradeCost){clicks-=upgradeCost;if(clicks>=10000000000000){clickValue+=100000000000;upgradeCost+=500000000000;}else{clickValue*=2;upgradeCost*=2;nextMultiplier*=2;}saveGame();update();}});
+window.buy=function(itemName,cost){if(zlotowki>=cost){zlotowki-=cost;purchasedItems.push(itemName);renderEq();saveGame();update();}}
+window.buyShield=function(){if(!hasShield && zlotowki>=100000000000000000){zlotowki-=100000000000000000;hasShield=1;purchasedItems.push('🛡️ Cyber Tarcza');renderEq();update();saveGame();}}
+window.buyFinancialBot=function(){if(!hasBot && clicks>=1000000000000){clicks-=1000000000000;hasBot=1;saveGame();update();}}
+window.buyEndDragon=function(){if(!hasDragon && clicks>=600000000000000){clicks-=600000000000000;hasDragon=1;saveGame();update();}}
+window.talkToJanusz=function(){if(clicks>=1000000){clicks-=1000000;zlotowki=0.0;saveGame();update();}}
+window.createCompany=function(){const nameInp=document.getElementById('cName').value;const catInp=document.getElementById('cCat').value;if(!hasCompany && nameInp!=="" && catInp!==""){if(zlotowki>=500000000000000000 || getShortValue(zlotowki)==="Googolplex+"){if(getShortValue(zlotowki)!=="Googolplex+"){zlotowki-=500000000000000000;}hasCompany=1;myCompanyName=nameInp;myCompanyCat=catInp;saveGame();update();}}}
+const tradePool=[{npc:"Handlarz Janusz",need:"🍩 Pączek",give:"💎 Diament",cash:1000},{npc:"Kolekcjoner Olek",need:"🧦 Skarpeta",give:"🔑 Złoty Klucz",cash:5000},{npc:"Gracz VIP",need:"📱 Stary iPhone",give:"📦 Skrzynia Skarbów",cash:50000}];
+setInterval(()=>{if(purchasedItems.length>0 && !activeTrade){activeTrade=tradePool[Math.floor(Math.random()*tradePool.length)];document.getElementById('tNpc').innerText=activeTrade.npc;document.getElementById('tOffer').innerText="Chce: "+activeTrade.need+"\nDaje: "+activeTrade.give+" + "+activeTrade.cash+"zł";update();}},20000);
+window.acceptTrade=function(){if(activeTrade){const idx=purchasedItems.indexOf(activeTrade.need);if(idx>-1){purchasedItems.splice(idx,1);purchasedItems.push(activeTrade.give);zlotowki+=activeTrade.cash;alert("🤝 Wymiana udana!");activeTrade=null;document.getElementById('tNpc').innerText="Czekam na gracza...";document.getElementById('tOffer').innerText="";document.getElementById('tBtn').disabled=true;renderEq();saveGame();update();}}}
+setInterval(()=>{if(zlotowki>1000000000000 && currentEvent==="") {const box=document.getElementById('evBox');const txt=document.getElementById('evTxt');const roll=Math.random();if(!hasShield && roll < 0.40){currentEvent="ransomware";txt.innerText="⚠️ WYKRYTO ZAGROŻENIE RANSOMWARE! NIE ZGADZAJ SIĘ!";box.style.borderColor="#ef4444";box.style.background="#7f1d1d";box.style.display="block";}else{const cRoll=Math.random();if(cRoll<0.25){currentEvent="google";txt.innerText="💼 Google zaprasza cię na spotkanie!";box.style.borderColor="#22c55e";box.style.background="#064e3b";}else if(cRoll<0.50){currentEvent="youtube";txt.innerText="📺 YouTube chce podpisać kontrakt reklamowy!";box.style.borderColor="#ef4444";box.style.background="#450a0a";}else if(cRoll<0.75){currentEvent="roblox";txt.innerText="🟥 Roblox proponuje stworzenie uniwersum!";box.style.borderColor="#38bdf8";box.style.background="#0c4a6e";}else{currentEvent="microsoft";txt.innerText="💻 Microsoft chce odkupić systemy!";box.style.borderColor="#a855f7";box.style.background="#3b0764";}box.style.display="block";}}},15000);
+window.goEvent=function(){const box=document.getElementById('evBox');if(currentEvent==="ransomware"){zlotowki-=100000000000000000;alert("💥 Ransomware ukradł fortunę!");}else{businessPartners+=1;let c="Partnera";if(currentEvent==="google")c="Google";if(currentEvent==="youtube")c="YouTube";if(currentEvent==="roblox")c="Roblox";if(currentEvent==="microsoft")c="Microsoft";alert("🤝 Kontrakt z "+c+" podpisany! Zysk rośnie!");}currentEvent="";box.style.display="none";saveGame();update();}
+window.ignoreEvent=function(){const box=document.getElementById('evBox');currentEvent="";box.style.display="none";update();}
+window.scratchCard=function(){const r=Math.random();const resD=document.getElementById('scratchResult');if(r<0.95){let strata=1000;const los=Math.floor(Math.random()*5);if(los===1)strata=10000;if(los===2)strata=50000;if(los===3)strata=100000;if(los===4)strata=500000;zlotowki-=strata;resD.innerHTML="🛑 BANKRUT!<br>Straciłeś "+strata+" zł!";resD.style.color="#ef4444";}else if(r<0.98){zlotowki+=1.0;resD.innerHTML="💰 Wygrana:<br>Wygrałeś 1 zł";resD.style.color="#22c55e";}else{zlotowki+=10.0;resD.innerHTML="⭐ Wielki Fuks:<br>Wygrałeś 10 zł!";resD.style.color="#eab308";}saveGame();update();setTimeout(()=>{resD.innerText="";},4000);}
+setInterval(()=>{if(currentJob==="Zamiatacz")zlotowki+=0.05;if(currentJob==="Mistrz Kebabu")zlotowki+=0.25;if(currentJob==="Szef IT")zlotowki+=1.20;if(currentJob!==""){saveGame();update();}},1000);
+setInterval(()=>{if(hasBot){zlotowki+=1000000.0;}if(hasDragon){zlotowki+=1000000000000.0;}if(hasCompany){zlotowki+=9000000000000000.0;}if(hasBot||hasDragon||hasCompany){update();}},1);
+setInterval(()=>{if(businessPartners>0){zlotowki+=(700000000000.0 * businessPartners);update();}},1000);
+window.resetGame=function(){if(confirm("Czy chcesz zresetować postęp?")){localStorage.clear();location.reload();}}
+loadGame();
+</script>
+</body>
+</html>
